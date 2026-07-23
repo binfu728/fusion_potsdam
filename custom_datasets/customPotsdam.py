@@ -84,6 +84,26 @@ class CustomNormalize(BaseTransform):
         return results
 
 
+@TRANSFORMS.register_module()
+class LoadOlmoEarthEmbedding(BaseTransform):
+    """从 .npy 加载 olmoearth 预计算 embedding。
+
+    路径规则：{embed_root}/{split}/{basename}.npy
+    basename = img_path 去掉前缀和 .png 后缀的部分。
+    embedding shape: (H_emb, W_emb, 768)，通常为 (128, 128, 768)。
+    """
+    def __init__(self, embed_root: str):
+        self.embed_root = embed_root
+
+    def transform(self, results: dict) -> dict:
+        img_path = results['img_path']
+        basename = Path(img_path).stem   # e.g. "2_10_0_0_512_512"
+        npy_path = Path(self.embed_root) / f"{basename}.npy"
+        embed = np.load(str(npy_path)).astype(np.float32)   # (H, W, 768)
+        results['olmoearth_embedding'] = embed
+        return results
+
+
 @DATASETS.register_module()
 class CustomPotsdamDataset(BaseSegDataset):
     """Potsdam 数据集：img_dir/{split}/*.png, ann_dir/{split}/*.png。

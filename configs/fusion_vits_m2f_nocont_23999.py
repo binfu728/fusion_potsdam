@@ -2,7 +2,7 @@ custom_imports = dict(
     imports=[
         "custom_datasets.customPotsdam",
         "custom_datasets.fusion_h5",
-        "custom_models.fusion_backbone",
+        "custom_models.fusion_backbone_v2",
     ],
     allow_failed_imports=False,
 )
@@ -12,7 +12,7 @@ _base_ = [
 ]
 
 # ── 路径 ───────────────────────────────────────────────────────────────────
-FUSION_CKPT = "/mnt/ht2-nas2/00-model/00-common/weights/20260709/weights.pth"
+FUSION_CKPT = "/mnt/qh2-nas3/00-model/00-limx/Dinov3/ckpt/stage2+stage3-zhejiang_no_cl/23999.pth"
 DATA_ROOT   = "/mnt/qh2-nas3/00-model/00-limx/datasets/potsdam/"
 
 # ── backbone – vit_large + fusion ──────────────────────────────────────────
@@ -35,12 +35,13 @@ model = dict(
     data_preprocessor=data_preprocessor,
     backbone=dict(
         _delete_=True,
-        type="FusionBackboneMmseg",
+        type="FusionBackboneMmsegV2",
         arch="vit_large",
         patch_size=16,
         interaction_indexes=[5, 11, 17, -1],
-        n_storage_tokens=0,
+        n_storage_tokens=4,
         layerscale_init=1e-5,
+        mask_k_bias=True,
         fusion_cfg=dict(dim=1024, depth=3, num_heads=8, num_patches_q=900, num_patches_kv=144, ff_mult=4),
         olmoearth_embed=768,
         img_size=img_size,
@@ -133,7 +134,7 @@ optim_wrapper = dict(
     ),
 )
 
-max_iters = 80000
+max_iters = 40000
 param_scheduler = [
     dict(type="LinearLR", start_factor=1e-3, begin=0, end=3000, by_epoch=False),
     dict(type="PolyLR", eta_min=0, power=0.9, begin=3000, end=max_iters, by_epoch=False),

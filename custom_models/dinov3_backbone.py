@@ -76,6 +76,7 @@ class DINOv3BackboneMmseg(BaseModule):
         interaction_indexes=None,
         n_storage_tokens=0,
         layerscale_init=1e-5,
+        mask_k_bias=False,
         img_size=512,
         checkpoint=None,
         freeze_backbone=True,
@@ -88,7 +89,8 @@ class DINOv3BackboneMmseg(BaseModule):
         _factory = {"vit_small": vit_small, "vit_base": vit_base, "vit_large": vit_large}[arch]
         self.backbone = _factory(
             patch_size=patch_size, img_size=img_size,
-            n_storage_tokens=n_storage_tokens, layerscale_init=layerscale_init)
+            n_storage_tokens=n_storage_tokens, layerscale_init=layerscale_init,
+            mask_k_bias=mask_k_bias)
         self.backbone.init_weights()
 
         if checkpoint:

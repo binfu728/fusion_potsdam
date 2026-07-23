@@ -2,7 +2,7 @@ custom_imports = dict(
     imports=[
         "custom_datasets.customPotsdam",
         "custom_datasets.fusion_h5",
-        "custom_models.fusion_backbone",
+        "custom_models.fusion_backbone_v3",
     ],
     allow_failed_imports=False,
 )
@@ -12,10 +12,10 @@ _base_ = [
 ]
 
 # ── 路径 ───────────────────────────────────────────────────────────────────
-FUSION_CKPT = "/mnt/ht2-nas2/00-model/00-common/weights/20260709/weights.pth"
-DATA_ROOT   = "/mnt/qh2-nas3/00-model/00-limx/datasets/potsdam/"
+FUSION_CKPT = "/mnt/qh2-nas3/00-model/00-limx/Dinov3/ckpt/stage2+stage3-zhejiang/31999.pth"
+EMBED_ROOT = "/mnt/qh2-nas3/00-model/00-limx/datasets/postdam_bgr_hyper/postdam_embeddings_v1_hypernet_tile512_patch4"
 
-# ── backbone – vit_large + fusion ──────────────────────────────────────────
+# ── backbone – vit_large + fusion + real olmoearth embeddings ──────────────
 img_size = 480          # 冻结于 fusion 2D-ALiBi（num_patches_q=900）
 num_classes = 5         # potsdam: 原始标签 1-5 (0/6 ignored → remapped to 0-4)
 
@@ -32,15 +32,17 @@ data_preprocessor = dict(
 )
 
 model = dict(
+    type="OlmoEarthEncoderDecoder",
     data_preprocessor=data_preprocessor,
     backbone=dict(
         _delete_=True,
-        type="FusionBackboneMmseg",
+        type="FusionBackboneMmsegV3",
         arch="vit_large",
         patch_size=16,
         interaction_indexes=[5, 11, 17, -1],
-        n_storage_tokens=0,
+        n_storage_tokens=4,
         layerscale_init=1e-5,
+        mask_k_bias=True,
         fusion_cfg=dict(dim=1024, depth=3, num_heads=8, num_patches_q=900, num_patches_kv=144, ff_mult=4),
         olmoearth_embed=768,
         img_size=img_size,
@@ -49,6 +51,7 @@ model = dict(
         finetune_vit=False,
     ),
     decode_head=dict(
+        type="Mask2FormerHead",
         in_channels=[1024, 1024, 1024, 1024],
         strides=[4, 8, 16, 32],
         num_classes=num_classes,
@@ -63,19 +66,25 @@ model = dict(
     ),
 )
 
-# ── 数据流水线（potsdam HR 图像；MS/SAR 由 stub olmoearth 提供）────────────
+# ── 数据流水线（potsdam HR 图像 + olmoearth .npy embedding）───────────────
+DEFAULT_META_KEYS = ('img_path', 'seg_map_path', 'ori_shape',
+                     'img_shape', 'pad_shape', 'scale_factor', 'flip',
+                     'flip_direction', 'reduce_zero_label')
+
 train_pipeline = [
     dict(type="LoadCustomRaster", img_size=img_size),
+    dict(type="LoadOlmoEarthEmbedding", embed_root=f"{EMBED_ROOT}/train/embeddings"),
     dict(type="CustomRandomRotate90", prob=0.5),
     dict(type="RandomFlip", prob=0.5, direction="horizontal"),
     dict(type="RandomFlip", prob=0.5, direction="vertical"),
     dict(type="CustomNormalize"),
-    dict(type="PackSegInputs"),
+    dict(type="PackSegInputs", meta_keys=DEFAULT_META_KEYS + ('olmoearth_embedding',)),
 ]
 val_pipeline = [
     dict(type="LoadCustomRaster", img_size=img_size),
+    dict(type="LoadOlmoEarthEmbedding", embed_root=f"{EMBED_ROOT}/val/embeddings"),
     dict(type="CustomNormalize"),
-    dict(type="PackSegInputs"),
+    dict(type="PackSegInputs", meta_keys=DEFAULT_META_KEYS + ('olmoearth_embedding',)),
 ]
 
 train_dataloader = dict(
@@ -84,7 +93,7 @@ train_dataloader = dict(
     num_workers=4,
     dataset=dict(
         type="CustomPotsdamDataset",
-        data_root=DATA_ROOT,
+        data_root="/mnt/qh2-nas3/00-model/00-limx/datasets/potsdam/",
         split="train",
         pipeline=train_pipeline,
     ),
@@ -95,7 +104,7 @@ val_dataloader = dict(
     num_workers=4,
     dataset=dict(
         type="CustomPotsdamDataset",
-        data_root=DATA_ROOT,
+        data_root="/mnt/qh2-nas3/00-model/00-limx/datasets/potsdam/",
         split="val",
         pipeline=val_pipeline,
     ),
@@ -106,7 +115,7 @@ test_dataloader = dict(
     num_workers=4,
     dataset=dict(
         type="CustomPotsdamDataset",
-        data_root=DATA_ROOT,
+        data_root="/mnt/qh2-nas3/00-model/00-limx/datasets/potsdam/",
         split="val",
         pipeline=val_pipeline,
     ),
@@ -133,7 +142,7 @@ optim_wrapper = dict(
     ),
 )
 
-max_iters = 80000
+max_iters = 40000
 param_scheduler = [
     dict(type="LinearLR", start_factor=1e-3, begin=0, end=3000, by_epoch=False),
     dict(type="PolyLR", eta_min=0, power=0.9, begin=3000, end=max_iters, by_epoch=False),

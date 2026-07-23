@@ -8,7 +8,7 @@ _base_ = [
 ]
 
 # ── 路径 ───────────────────────────────────────────────────────────────
-DINO_CKPT = "/mnt/ht2-nas2/00-model/00-common/weights/20260709/weights.pth"
+DINO_CKPT = "/mnt/qh2-nas3/00-model/00-limx/Dinov3/ckpt/stage2+stage3-zhejiang/23999.pth"
 DATA_ROOT = "/mnt/qh2-nas3/00-model/00-limx/datasets/potsdam/"
 
 # ── backbone: 纯 DINOv3 vit_large（从 fusion ckpt 取 backbone 权重，冻结）──
@@ -29,8 +29,9 @@ model = dict(
         arch="vit_large",
         patch_size=16,
         interaction_indexes=[5, 11, 17, 23],
-        n_storage_tokens=0,
+        n_storage_tokens=4,
         layerscale_init=1e-5,
+        mask_k_bias=True,
         img_size=img_size,
         checkpoint=DINO_CKPT,
         freeze_backbone=True,       # True=冻结ViT只训adapter+m2f; False=全参微调
@@ -87,7 +88,7 @@ optim_wrapper = dict(
         },
         norm_decay_mult=0.0))
 
-max_iters = 80000
+max_iters = 40000
 param_scheduler = [
     dict(type="LinearLR", start_factor=1e-3, begin=0, end=3000, by_epoch=False),
     dict(type="PolyLR", eta_min=0, power=0.9, begin=3000, end=max_iters, by_epoch=False)]

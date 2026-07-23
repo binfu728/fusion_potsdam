@@ -11,6 +11,6 @@ export CUDA_VISIBLE_DEVICES
 cd "$MMSEG_ROOT"
 export PYTHONPATH="$MMSEG_ROOT:${PYTHONPATH:-}"
 python -m torch.distributed.run \
-    --nnodes=1 --nproc_per_node=$GPUS --master_port=${PORT:-29551} \
-    train.py configs/dinov3_m2f.py --launcher pytorch \
-    --work-dir work_dirs/dinov3_m2f "$@"
+    --nnodes=1 --nproc_per_node=$GPUS --master_port=${PORT:-29552} \
+    train.py configs/dinov3_m2f_nocont_23999.py --launcher pytorch \
+    --work-dir work_dirs/dinov3_m2f_nocont_23999 "$@"
