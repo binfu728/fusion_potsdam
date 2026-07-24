@@ -25,7 +25,7 @@
 
 | 实验 | Checkpoint | mIoU | mFscore | Best Iter | 状态 |
 |------|-----------|------|---------|-----------|------|
-| **fusion 9999** | `stage2+stage3-zhejiang/9999.pth` | **87.85** | 93.41 | 22000 | ✅ 完成 |
+| **fusion 9999** (context = mask_token) | `stage2+stage3-zhejiang/9999.pth` | **87.85** | 93.41 | 22000 | ✅ 完成 |
 | **fusion 23999** | `stage2+stage3-zhejiang/23999.pth` | **87.54** | 93.24 | 14000 | ✅ 完成 |
 | **fusion 31999** | `stage2+stage3-zhejiang/31999.pth` | **87.64** | 93.29 | 14000 | ✅ 完成 |
 
