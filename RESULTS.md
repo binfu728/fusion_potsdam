@@ -53,31 +53,46 @@
 
 ## 汇总对比
 
-| # | 实验名称 | Backbone | Context | Contrastive | mIoU | mFscore |
-|---|---------|----------|---------|-------------|------|---------|
-| 1 | nocont HR 9999 | HR | — | No | **88.49** | 93.77 |
-| 2 | HR 9999 | HR | — | Yes | 88.43 | 93.73 |
-| 3 | nocont HR 23999 | HR | — | No | 88.12 | 93.57 |
-| 4 | HR 23999 | HR | — | Yes | 88.11 | 93.56 |
-| 5 | HR 31999 | HR | — | Yes | 87.98 | 93.47 |
-| 6 | fusion 9999 | fusion | mask_token | Yes | 87.85 | 93.41 |
-| 7 | nocont fusion 9999 | fusion | mask_token | No | 87.85 | 93.41 |
-| 8 | fusion 31999 (mask) | fusion | mask_token | Yes | 87.64 | 93.29 |
-| 9 | fusion 31999 (olmov1) | fusion | olmoearth RGB | Yes | 87.64 | 93.29 |
-| 10 | nocont fusion 23999 | fusion | mask_token | No | 87.66 | 93.30 |
-| 11 | fusion 23999 | fusion | mask_token | Yes | 87.54 | 93.24 |
+| # | 实验名称 | Backbone | Pretrain | Context | Contrastive | mIoU | mFscore |
+|---|---------|----------|----------|---------|-------------|------|---------|
+| 1 | **DINOv3 LVD-1689M (ori)** | HR | ImageNet | — | — | **89.00** | 94.07 |
+| 2 | nocont HR 9999 | HR | zhejiang | — | No | 88.49 | 93.77 |
+| 3 | HR 9999 | HR | zhejiang | — | Yes | 88.43 | 93.73 |
+| 4 | nocont HR 23999 | HR | zhejiang | — | No | 88.12 | 93.57 |
+| 5 | HR 23999 | HR | zhejiang | — | Yes | 88.11 | 93.56 |
+| 6 | HR 31999 | HR | zhejiang | — | Yes | 87.98 | 93.47 |
+| 7 | fusion 9999 | fusion | zhejiang | mask_token | Yes | 87.85 | 93.41 |
+| 8 | nocont fusion 9999 | fusion | zhejiang | mask_token | No | 87.85 | 93.41 |
+| 9 | nocont fusion 23999 | fusion | zhejiang | mask_token | No | 87.66 | 93.30 |
+| 10 | fusion 31999 (mask) | fusion | zhejiang | mask_token | Yes | 87.64 | 93.29 |
+| 11 | fusion 31999 (olmov1) | fusion | zhejiang | olmoearth RGB | Yes | 87.64 | 93.29 |
+| 12 | fusion 23999 | fusion | zhejiang | mask_token | Yes | 87.54 | 93.24 |
+| 13 | **DINOv3 SAT-493M (sat)** | HR | SAT RS | — | — | **86.85** | 92.85 |
 
-> 按 mIoU 降序排列。HR 分支整体优于 fusion 分支 (~0.5-0.7 mIoU)。
+> 按 mIoU 降序排列。
+
+---
+
+## 基线对比 (Official DINOv3 Pretraining)
+
+| 实验 | Checkpoint | mIoU | mFscore | Best Iter | 状态 |
+|------|-----------|------|---------|-----------|------|
+| **DINOv3 LVD-1689M (ImageNet)** | `dinov3_vitl16_pretrain_lvd1689m-8aa4cbdd.pth` | **89.00** | 94.07 | 14000 | ✅ 完成 |
+| **DINOv3 SAT-493M (Remote Sensing)** | `dinov3_vitl16_pretrain_sat493m-eadcf0ff.pth` | **86.85** | 92.85 | 22000 | ✅ 完成 |
+
+> 基线使用官方 DINOv3 预训练权重（无 fusion/olmoearth），与本项目 zhejiang SSL 权重对比。
 
 ---
 
 ## 关键发现
 
-1. **HR > Fusion**: 纯 DINOv3 backbone 始终优于 fusion backbone，差距约 0.5-0.9 mIoU
-2. **Checkpoint 越早越好**: 9999.pth 在多数实验中优于 23999/31999.pth（best mIoU 出现在更早的 iter）
-3. **No Contrastive Loss 微弱优势**: nocont 在 HR 分支上有 ~0.05-0.06 mIoU 的提升；在 fusion 分支上差异不明显
-4. **Context 类型无显著差异**: fusion 31999 使用 learnable masked token (87.64) vs olmoearth RGB embedding (87.64) 结果一致
-5. **最佳模型**: nocont HR 9999 (88.49 mIoU / 93.77 mFscore)
+1. **ImageNet LVD-1689M 最优**: 官方 ImageNet 预训练 (89.00 mIoU) 超越所有实验，但仅用 ViT HR backbone + 冻结
+2. **zhejiang SSL > SAT RS**: 浙江遥感 SSL (88.43-88.49) 显著优于官方遥感 SAT-493M (86.85)，差距 ~1.6 mIoU
+3. **HR > Fusion**: 纯 DINOv3 backbone 始终优于 fusion backbone，差距约 0.5-0.9 mIoU
+4. **Checkpoint 越早越好**: 9999.pth 在多数实验中优于 23999/31999.pth（best mIoU 出现在更早的 iter）
+5. **No Contrastive Loss 微弱优势**: nocont 在 HR 分支上有 ~0.05-0.06 mIoU 的提升；在 fusion 分支上差异不明显
+6. **Context 类型无显著差异**: fusion 31999 使用 learnable masked token (87.64) vs olmoearth RGB embedding (87.64) 结果一致
+7. **最佳模型**: DINOv3 LVD-1689M (89.00 mIoU / 94.07 mFscore), 其次是 nocont HR 9999 (88.49 mIoU / 93.77 mFscore)
 
 ---
 
@@ -96,3 +111,5 @@
 | nocont fusion 9999 | `fusion_vits_m2f_nocont_9999` | `fusion_vits_m2f_nocont_9999.py` |
 | nocont fusion 23999 | `fusion_vits_m2f_nocont_23999` | `fusion_vits_m2f_nocont_23999.py` |
 | fusion 31999 (olmov1) | `fusion_vits_m2f_olmov1` | `fusion_vits_m2f_olmov1.py` |
+| DINOv3 LVD-1689M (ImageNet) | `dinov3_m2f_ori` | `dinov3_m2f_ori.py` |
+| DINOv3 SAT-493M (Remote Sensing) | `dinov3_m2f_sat` | `dinov3_m2f_sat.py` |
