@@ -12,5 +12,5 @@ cd "$MMSEG_ROOT"
 export PYTHONPATH="$MMSEG_ROOT:${PYTHONPATH:-}"
 python -m torch.distributed.run \
     --nnodes=1 --nproc_per_node=$GPUS --master_port=${PORT:-29551} \
-    train.py configs/dinov3_m2f_sat.py --launcher pytorch \
-    --work-dir work_dirs/dinov3_m2f_sat "$@"
+    train.py configs/dinov3_m2f_gram_4999.py --launcher pytorch \
+    --work-dir work_dirs/dinov3_m2f_gram_4999 "$@"

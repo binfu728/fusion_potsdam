@@ -49,6 +49,12 @@
 |------|-----------|------|---------|-----------|------|
 | **fusion 31999 (olmov1)** | `stage2+stage3-zhejiang/31999.pth` | **87.64** | 93.29 | 14000 | ✅ 完成 |
 
+### 6. Gram Loss (no contrastive, no fusion) — HR 分支
+
+| 实验 | Checkpoint | mIoU | mFscore | Best Iter | 状态 |
+|------|-----------|------|---------|-----------|------|
+| gram HR 4999 | `gram_nofusion/4999_new.pt` | 88.39 | 93.75 | 14000 | ✅ 完成 |
+
 ---
 
 ## 汇总对比
@@ -58,16 +64,17 @@
 | 1 | **DINOv3 LVD-1689M (ori)** | HR | ImageNet | — | — | **89.00** | 94.07 |
 | 2 | nocont HR 9999 | HR | zhejiang | — | No | 88.49 | 93.77 |
 | 3 | HR 9999 | HR | zhejiang | — | Yes | 88.43 | 93.73 |
-| 4 | nocont HR 23999 | HR | zhejiang | — | No | 88.12 | 93.57 |
-| 5 | HR 23999 | HR | zhejiang | — | Yes | 88.11 | 93.56 |
-| 6 | HR 31999 | HR | zhejiang | — | Yes | 87.98 | 93.47 |
-| 7 | fusion 9999 | fusion | zhejiang | mask_token | Yes | 87.85 | 93.41 |
-| 8 | nocont fusion 9999 | fusion | zhejiang | mask_token | No | 87.85 | 93.41 |
-| 9 | nocont fusion 23999 | fusion | zhejiang | mask_token | No | 87.66 | 93.30 |
-| 10 | fusion 31999 (mask) | fusion | zhejiang | mask_token | Yes | 87.64 | 93.29 |
-| 11 | fusion 31999 (olmov1) | fusion | zhejiang | olmoearth RGB | Yes | 87.64 | 93.29 |
-| 12 | fusion 23999 | fusion | zhejiang | mask_token | Yes | 87.54 | 93.24 |
-| 13 | **DINOv3 SAT-493M (sat)** | HR | SAT RS | — | — | **86.85** | 92.85 |
+| 4 | gram HR 4999 | HR | gram | — | No (gram) | 88.39 | 93.75 |
+| 5 | nocont HR 23999 | HR | zhejiang | — | No | 88.12 | 93.57 |
+| 6 | HR 23999 | HR | zhejiang | — | Yes | 88.11 | 93.56 |
+| 7 | HR 31999 | HR | zhejiang | — | Yes | 87.98 | 93.47 |
+| 8 | fusion 9999 | fusion | zhejiang | mask_token | Yes | 87.85 | 93.41 |
+| 9 | nocont fusion 9999 | fusion | zhejiang | mask_token | No | 87.85 | 93.41 |
+| 10 | nocont fusion 23999 | fusion | zhejiang | mask_token | No | 87.66 | 93.30 |
+| 11 | fusion 31999 (mask) | fusion | zhejiang | mask_token | Yes | 87.64 | 93.29 |
+| 12 | fusion 31999 (olmov1) | fusion | zhejiang | olmoearth RGB | Yes | 87.64 | 93.29 |
+| 13 | fusion 23999 | fusion | zhejiang | mask_token | Yes | 87.54 | 93.24 |
+| 14 | **DINOv3 SAT-493M (sat)** | HR | SAT RS | — | — | **86.85** | 92.85 |
 
 > 按 mIoU 降序排列。
 
@@ -113,3 +120,4 @@
 | fusion 31999 (olmov1) | `fusion_vits_m2f_olmov1` | `fusion_vits_m2f_olmov1.py` |
 | DINOv3 LVD-1689M (ImageNet) | `dinov3_m2f_ori` | `dinov3_m2f_ori.py` |
 | DINOv3 SAT-493M (Remote Sensing) | `dinov3_m2f_sat` | `dinov3_m2f_sat.py` |
+| gram HR 4999 | `dinov3_m2f_gram_4999` | `dinov3_m2f_gram_4999.py` |

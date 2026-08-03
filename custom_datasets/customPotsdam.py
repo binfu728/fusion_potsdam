@@ -7,6 +7,43 @@ from mmseg.datasets.basesegdataset import BaseSegDataset
 
 
 @TRANSFORMS.register_module()
+class RandomColorJitter(BaseTransform):
+    """对 RGB 图像做随机亮度/对比度/饱和度扰动（在 CustomNormalize 之前运行）。"""
+    def __init__(self, brightness=0.2, contrast=0.2, saturation=0.1, hue=0.0, prob=0.5):
+        self.brightness = brightness
+        self.contrast = contrast
+        self.saturation = saturation
+        self.hue = hue
+        self.prob = prob
+
+    def transform(self, results: dict) -> dict:
+        if np.random.rand() >= self.prob:
+            return results
+        img = results["img"].astype(np.float32)
+
+        # Brightness
+        if self.brightness > 0:
+            b = np.random.uniform(-self.brightness, self.brightness) * 255
+            img = np.clip(img + b, 0, 255)
+
+        # Contrast
+        if self.contrast > 0:
+            mean = img.mean()
+            c = np.random.uniform(1 - self.contrast, 1 + self.contrast)
+            img = np.clip((img - mean) * c + mean, 0, 255)
+
+        # Saturation (gray blend)
+        if self.saturation > 0:
+            gray = cv2.cvtColor(img.astype(np.uint8), cv2.COLOR_RGB2GRAY)
+            gray = np.stack([gray] * 3, axis=-1).astype(np.float32)
+            s = np.random.uniform(1 - self.saturation, 1 + self.saturation)
+            img = np.clip(gray * (1 - s) + img * s, 0, 255)
+
+        results["img"] = img.astype(np.uint8)
+        return results
+
+
+@TRANSFORMS.register_module()
 class LoadCustomRaster(BaseTransform):
     """第一步加载：读取、BGR→RGB、Resize + 标签重映射。
 
