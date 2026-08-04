@@ -59,24 +59,24 @@
 
 ## 汇总对比
 
-| # | 实验名称 | Backbone | Pretrain | Context | Contrastive | mIoU | mFscore |
-|---|---------|----------|----------|---------|-------------|------|---------|
-| 1 | **DINOv3 LVD-1689M (ori)** | HR | ImageNet | — | — | **89.00** | 94.07 |
-| 2 | nocont HR 9999 | HR | zhejiang | — | No | 88.49 | 93.77 |
-| 3 | HR 9999 | HR | zhejiang | — | Yes | 88.43 | 93.73 |
-| 4 | gram HR 4999 | HR | gram | — | No (gram) | 88.39 | 93.75 |
-| 5 | nocont HR 23999 | HR | zhejiang | — | No | 88.12 | 93.57 |
-| 6 | HR 23999 | HR | zhejiang | — | Yes | 88.11 | 93.56 |
-| 7 | HR 31999 | HR | zhejiang | — | Yes | 87.98 | 93.47 |
-| 8 | fusion 9999 | fusion | zhejiang | mask_token | Yes | 87.85 | 93.41 |
-| 9 | nocont fusion 9999 | fusion | zhejiang | mask_token | No | 87.85 | 93.41 |
-| 10 | nocont fusion 23999 | fusion | zhejiang | mask_token | No | 87.66 | 93.30 |
-| 11 | fusion 31999 (mask) | fusion | zhejiang | mask_token | Yes | 87.64 | 93.29 |
-| 12 | fusion 31999 (olmov1) | fusion | zhejiang | olmoearth RGB | Yes | 87.64 | 93.29 |
-| 13 | fusion 23999 | fusion | zhejiang | mask_token | Yes | 87.54 | 93.24 |
-| 14 | **DINOv3 SAT-493M (sat)** | HR | SAT RS | — | — | **86.85** | 92.85 |
+| # | 实验名称 | Backbone | Pretrain | Context | Contrastive | mIoU | mFscore | mean mIoU | mean mFscore |
+|---|---------|----------|----------|---------|-------------|------|---------|-----------|-------------|
+| 1 | **DINOv3 LVD-1689M (ori)** | HR | ImageNet | — | — | **89.00** | 94.07 | 87.72 | 93.32 |
+| 2 | nocont HR 9999 | HR | zhejiang | — | No | 88.49 | 93.77 | 86.62 | 92.66 |
+| 3 | HR 9999 | HR | zhejiang | — | Yes | 88.43 | 93.73 | 87.15 | 92.99 |
+| 4 | gram HR 4999 | HR | gram | — | No (gram) | 88.39 | 93.75 | 86.39 | 92.56 |
+| 5 | nocont HR 23999 | HR | zhejiang | — | No | 88.12 | 93.57 | 86.42 | 92.56 |
+| 6 | HR 23999 | HR | zhejiang | — | Yes | 88.11 | 93.56 | 86.39 | 92.53 |
+| 7 | HR 31999 | HR | zhejiang | — | Yes | 87.98 | 93.47 | 86.04 | 92.31 |
+| 8 | fusion 9999 | fusion | zhejiang | mask_token | Yes | 87.85 | 93.41 | 86.22 | 92.43 |
+| 9 | nocont fusion 9999 | fusion | zhejiang | mask_token | No | 87.85 | 93.41 | 86.62 | 92.69 |
+| 10 | nocont fusion 23999 | fusion | zhejiang | mask_token | No | 87.66 | 93.30 | 86.28 | 92.49 |
+| 11 | fusion 31999 (mask) | fusion | zhejiang | mask_token | Yes | 87.64 | 93.29 | 85.29 | 91.86 |
+| 12 | fusion 31999 (olmov1) | fusion | zhejiang | olmoearth RGB | Yes | 87.64 | 93.29 | 86.18 | 92.43 |
+| 13 | fusion 23999 | fusion | zhejiang | mask_token | Yes | 87.54 | 93.24 | 86.08 | 92.37 |
+| 14 | **DINOv3 SAT-493M (sat)** | HR | SAT RS | — | — | **86.85** | 92.85 | 85.76 | 92.20 |
 
-> 按 mIoU 降序排列。
+> 按 mIoU 降序排列。mean = iter≥6000 后所有验证结果的均值。
 
 ---
 
